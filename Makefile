@@ -19,7 +19,7 @@ GO_FLAGS ?= -tags='$(subst $(space),$(comma),${GO_BUILDTAGS})' -ldflags='${GO_LD
 
 TOOLS_DIR := ${CURDIR}/tools
 TOOLS_BIN := ${TOOLS_DIR}/bin
-TOOLS := $(shell cd ${TOOLS_DIR} && go list -v -x -f '{{ join .Imports " " }}' -tags=tools)
+TOOLS := $(shell cd ${TOOLS_DIR} && go list -e -v -x -f '{{ join .Imports " " }}' -tags=tools)
 
 GO_PKGS := ./...
 
@@ -63,14 +63,14 @@ coverage: tools/bin/gotestsum  ## Takes packages test coverage.
 
 ##@ fmt, lint
 
-.PHONY: lint
-lint: fmt lint/golangci-lint  ## Run all linters.
-
 .PHONY: fmt
 fmt: tools/goimportz tools/gofumpt  ## Run goimportz and gofumpt.
 	$(call target)
 	find . -iname "*.go" -not -path "./vendor/**" | xargs -P ${JOBS} ${TOOLS_BIN}/goimportz -local=${PKG},$(subst /protocol,,$(PKG)) -w
 	find . -iname "*.go" -not -path "./vendor/**" | xargs -P ${JOBS} ${TOOLS_BIN}/gofumpt -extra -w
+
+.PHONY: lint
+lint: lint/golangci-lint  ## Run all linters.
 
 .PHONY: lint/golangci-lint
 lint/golangci-lint: tools/golangci-lint .golangci.yml  ## Run golangci-lint.

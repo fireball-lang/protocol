@@ -93,7 +93,7 @@ type LocationLink struct {
 	// TargetSelectionRange is the range that should be selected and revealed when this link is being followed,
 	// e.g the name of a function.
 	//
-	// Must be contained by the the TargetRange. See also DocumentSymbol#range
+	// Must be contained by the TargetRange. See also DocumentSymbol#range
 	TargetSelectionRange Range `json:"targetSelectionRange"`
 }
 
@@ -346,7 +346,7 @@ const (
 	// ClojureLanguage Clojure Language.
 	ClojureLanguage LanguageIdentifier = "clojure"
 
-	// CoffeescriptLanguage CoffeeScript Language.
+	// CoffeeScriptLanguage CoffeeScript Language.
 	CoffeeScriptLanguage LanguageIdentifier = "coffeescript"
 
 	// CLanguage C Language.
@@ -683,16 +683,16 @@ const (
 //
 // Here is an example how such a string can be constructed using JavaScript / TypeScript:
 //
-//  let markdown: MarkdownContent = {
-//   kind: MarkupKind.Markdown,
-//    value: [
-//    	'# Header',
-//    	'Some text',
-//    	'```typescript',
-//    'someCode();',
-//    '```'
-//    ].join('\n')
-//  };
+//	let markdown: MarkdownContent = {
+//	 kind: MarkupKind.Markdown,
+//	  value: [
+//	  	'# Header',
+//	  	'Some text',
+//	  	'```typescript',
+//	  'someCode();',
+//	  '```'
+//	  ].join('\n')
+//	};
 //
 // NOTE: clients might sanitize the return markdown. A client could decide to
 // remove HTML from the markdown to avoid script execution.
