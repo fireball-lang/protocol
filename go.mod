@@ -1,4 +1,4 @@
-module github.com/MineGame159/protocol
+module github.com/fireball-lang/protocol
 
 go 1.25.0
 
