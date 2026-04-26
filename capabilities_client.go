@@ -915,6 +915,26 @@ type SemanticTokensClientCapabilities struct {
 
 	// MultilineTokenSupport whether the client supports tokens that can span multiple lines.
 	MultilineTokenSupport bool `json:"multilineTokenSupport,omitempty"`
+
+	// ServerCancelSupport whether the client allows the server to actively cancel a
+	// semantic token request, e.g. supports returning
+	// ErrorCodes.ServerCancelled. If a server does the client
+	// needs to retrigger the request.
+	//
+	// @since 3.17.0
+	ServerCancelSupport bool `json:"serverCancelSupport,omitempty"`
+
+	// AugmentsSyntaxTokens whether the client uses semantic tokens to augment existing
+	// syntax tokens. If set to `true` client side created syntax
+	// tokens and semantic tokens are both used for colorization. If
+	// set to `false` the client only uses the returned semantic tokens
+	// for colorization.
+	//
+	// If the value is `undefined` then the client behavior is not
+	// specified.
+	//
+	// @since 3.17.0
+	AugmentsSyntaxTokens bool `json:"augmentsSyntaxTokens,omitempty"`
 }
 
 // SemanticTokensWorkspaceClientCapabilitiesRequests capabilities specific to the "textDocument/semanticTokens/xxx" request.

@@ -436,6 +436,23 @@ type LinkedEditingRangeRegistrationOptions struct {
 // @since 3.16.0.
 type SemanticTokensOptions struct {
 	WorkDoneProgressOptions
+
+	// Legend the legend used by the server.
+	Legend SemanticTokensLegend `json:"legend"`
+
+	// Range server supports providing semantic tokens for a specific range of a document.
+	Range bool `json:"range,omitempty"`
+
+	// Full server supports providing semantic tokens for a full document.
+	Full *SemanticTokensFull `json:"full,omitempty"`
+}
+
+// SemanticTokensFull option of full semantic tokens provider server capabilities.
+//
+// @since 3.16.0.
+type SemanticTokensFull struct {
+	// Delta the server supports deltas for full documents.
+	Delta bool `json:"delta,omitempty"`
 }
 
 // SemanticTokensRegistrationOptions registration option of semantic tokens provider server capabilities.
