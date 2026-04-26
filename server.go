@@ -802,8 +802,8 @@ type Server interface {
 	ColorPresentation(ctx context.Context, params *ColorPresentationParams) (result []ColorPresentation, err error)
 	Completion(ctx context.Context, params *CompletionParams) (result *CompletionList, err error)
 	CompletionResolve(ctx context.Context, params *CompletionItem) (result *CompletionItem, err error)
-	Declaration(ctx context.Context, params *DeclarationParams) (result []Location /* Declaration | DeclarationLink[] | null */, err error)
-	Definition(ctx context.Context, params *DefinitionParams) (result []Location /* Definition | DefinitionLink[] | null */, err error)
+	Declaration(ctx context.Context, params *DeclarationParams) (result interface{} /* Location | LocationLink[] | null */, err error)
+	Definition(ctx context.Context, params *DefinitionParams) (result interface{} /* Location | LocationLink[] | null */, err error)
 	DidChange(ctx context.Context, params *DidChangeTextDocumentParams) (err error)
 	DidChangeConfiguration(ctx context.Context, params *DidChangeConfigurationParams) (err error)
 	DidChangeWatchedFiles(ctx context.Context, params *DidChangeWatchedFilesParams) (err error)
@@ -1246,7 +1246,7 @@ func (s *server) CompletionResolve(ctx context.Context, params *CompletionItem) 
 // The result type LocationLink[] got introduce with version 3.14.0 and depends in the corresponding client capability `clientCapabilities.textDocument.declaration.linkSupport`.
 //
 // @since 3.14.0.
-func (s *server) Declaration(ctx context.Context, params *DeclarationParams) (result []Location, err error) {
+func (s *server) Declaration(ctx context.Context, params *DeclarationParams) (result interface{}, err error) {
 	s.logger.Debug("call " + MethodTextDocumentDeclaration)
 	defer s.logger.Debug("end "+MethodTextDocumentDeclaration, "error", err)
 
@@ -1262,7 +1262,7 @@ func (s *server) Declaration(ctx context.Context, params *DeclarationParams) (re
 // The result type `[]LocationLink` got introduce with version 3.14.0 and depends in the corresponding client capability `clientCapabilities.textDocument.definition.linkSupport`.
 //
 // @since 3.14.0.
-func (s *server) Definition(ctx context.Context, params *DefinitionParams) (result []Location, err error) {
+func (s *server) Definition(ctx context.Context, params *DefinitionParams) (result interface{}, err error) {
 	s.logger.Debug("call " + MethodTextDocumentDefinition)
 	defer s.logger.Debug("end "+MethodTextDocumentDefinition, "error", err)
 
