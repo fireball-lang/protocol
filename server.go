@@ -7,17 +7,16 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/segmentio/encoding/json"
-	"go.uber.org/zap"
-
 	"go.lsp.dev/jsonrpc2"
 	"go.lsp.dev/pkg/xcontext"
 )
 
 // ServerDispatcher returns a Server that dispatches LSP requests across the
 // given jsonrpc2 connection.
-func ServerDispatcher(conn jsonrpc2.Conn, logger *zap.Logger) Server {
+func ServerDispatcher(conn jsonrpc2.Conn, logger *slog.Logger) Server {
 	return &server{
 		Conn:   conn,
 		logger: logger,
@@ -68,7 +67,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 
 	switch req.Method() {
 	case MethodInitialize: // request
-		defer logger.Debug(MethodInitialize, zap.Error(err))
+		defer logger.Debug(MethodInitialize, "error", err)
 
 		var params InitializeParams
 		if err := dec.Decode(&params); err != nil {
@@ -80,7 +79,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodInitialized: // notification
-		defer logger.Debug(MethodInitialized, zap.Error(err))
+		defer logger.Debug(MethodInitialized, "error", err)
 
 		var params InitializedParams
 		if err := dec.Decode(&params); err != nil {
@@ -92,7 +91,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, nil, err)
 
 	case MethodShutdown: // request
-		defer logger.Debug(MethodShutdown, zap.Error(err))
+		defer logger.Debug(MethodShutdown, "error", err)
 
 		if len(req.Params()) > 0 {
 			return true, reply(ctx, nil, fmt.Errorf("expected no params: %w", jsonrpc2.ErrInvalidParams))
@@ -103,7 +102,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, nil, err)
 
 	case MethodExit: // notification
-		defer logger.Debug(MethodExit, zap.Error(err))
+		defer logger.Debug(MethodExit, "error", err)
 
 		if len(req.Params()) > 0 {
 			return true, reply(ctx, nil, fmt.Errorf("expected no params: %w", jsonrpc2.ErrInvalidParams))
@@ -114,7 +113,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, nil, err)
 
 	case MethodWorkDoneProgressCancel: // notification
-		defer logger.Debug(MethodWorkDoneProgressCancel, zap.Error(err))
+		defer logger.Debug(MethodWorkDoneProgressCancel, "error", err)
 
 		var params WorkDoneProgressCancelParams
 		if err := dec.Decode(&params); err != nil {
@@ -126,7 +125,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, nil, err)
 
 	case MethodLogTrace: // notification
-		defer logger.Debug(MethodLogTrace, zap.Error(err))
+		defer logger.Debug(MethodLogTrace, "error", err)
 
 		var params LogTraceParams
 		if err := dec.Decode(&params); err != nil {
@@ -138,7 +137,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, nil, err)
 
 	case MethodSetTrace: // notification
-		defer logger.Debug(MethodSetTrace, zap.Error(err))
+		defer logger.Debug(MethodSetTrace, "error", err)
 
 		var params SetTraceParams
 		if err := dec.Decode(&params); err != nil {
@@ -150,7 +149,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, nil, err)
 
 	case MethodTextDocumentCodeAction: // request
-		defer logger.Debug(MethodTextDocumentCodeAction, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentCodeAction, "error", err)
 
 		var params CodeActionParams
 		if err := dec.Decode(&params); err != nil {
@@ -162,7 +161,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodTextDocumentCodeLens: // request
-		defer logger.Debug(MethodTextDocumentCodeLens, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentCodeLens, "error", err)
 
 		var params CodeLensParams
 		if err := dec.Decode(&params); err != nil {
@@ -174,7 +173,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodCodeLensResolve: // request
-		defer logger.Debug(MethodCodeLensResolve, zap.Error(err))
+		defer logger.Debug(MethodCodeLensResolve, "error", err)
 
 		var params CodeLens
 		if err := dec.Decode(&params); err != nil {
@@ -186,7 +185,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodTextDocumentColorPresentation: // request
-		defer logger.Debug(MethodTextDocumentColorPresentation, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentColorPresentation, "error", err)
 
 		var params ColorPresentationParams
 		if err := dec.Decode(&params); err != nil {
@@ -198,7 +197,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodTextDocumentCompletion: // request
-		defer logger.Debug(MethodTextDocumentCompletion, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentCompletion, "error", err)
 
 		var params CompletionParams
 		if err := dec.Decode(&params); err != nil {
@@ -210,7 +209,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodCompletionItemResolve: // request
-		defer logger.Debug(MethodCompletionItemResolve, zap.Error(err))
+		defer logger.Debug(MethodCompletionItemResolve, "error", err)
 
 		var params CompletionItem
 		if err := dec.Decode(&params); err != nil {
@@ -222,7 +221,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodTextDocumentDeclaration: // request
-		defer logger.Debug(MethodTextDocumentDeclaration, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentDeclaration, "error", err)
 
 		var params DeclarationParams
 		if err := dec.Decode(&params); err != nil {
@@ -234,7 +233,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodTextDocumentDefinition: // request
-		defer logger.Debug(MethodTextDocumentDefinition, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentDefinition, "error", err)
 
 		var params DefinitionParams
 		if err := dec.Decode(&params); err != nil {
@@ -246,7 +245,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodTextDocumentDidChange: // notification
-		defer logger.Debug(MethodTextDocumentDidChange, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentDidChange, "error", err)
 
 		var params DidChangeTextDocumentParams
 		if err := dec.Decode(&params); err != nil {
@@ -258,7 +257,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, nil, err)
 
 	case MethodWorkspaceDidChangeConfiguration: // notification
-		defer logger.Debug(MethodWorkspaceDidChangeConfiguration, zap.Error(err))
+		defer logger.Debug(MethodWorkspaceDidChangeConfiguration, "error", err)
 
 		var params DidChangeConfigurationParams
 		if err := dec.Decode(&params); err != nil {
@@ -270,7 +269,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, nil, err)
 
 	case MethodWorkspaceDidChangeWatchedFiles: // notification
-		defer logger.Debug(MethodWorkspaceDidChangeWatchedFiles, zap.Error(err))
+		defer logger.Debug(MethodWorkspaceDidChangeWatchedFiles, "error", err)
 
 		var params DidChangeWatchedFilesParams
 		if err := dec.Decode(&params); err != nil {
@@ -282,7 +281,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, nil, err)
 
 	case MethodWorkspaceDidChangeWorkspaceFolders: // notification
-		defer logger.Debug(MethodWorkspaceDidChangeWorkspaceFolders, zap.Error(err))
+		defer logger.Debug(MethodWorkspaceDidChangeWorkspaceFolders, "error", err)
 
 		var params DidChangeWorkspaceFoldersParams
 		if err := dec.Decode(&params); err != nil {
@@ -294,7 +293,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, nil, err)
 
 	case MethodTextDocumentDidClose: // notification
-		defer logger.Debug(MethodTextDocumentDidClose, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentDidClose, "error", err)
 
 		var params DidCloseTextDocumentParams
 		if err := dec.Decode(&params); err != nil {
@@ -306,7 +305,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, nil, err)
 
 	case MethodTextDocumentDidOpen: // notification
-		defer logger.Debug(MethodTextDocumentDidOpen, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentDidOpen, "error", err)
 
 		var params DidOpenTextDocumentParams
 		if err := dec.Decode(&params); err != nil {
@@ -318,7 +317,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, nil, err)
 
 	case MethodTextDocumentDidSave: // notification
-		defer logger.Debug(MethodTextDocumentDidSave, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentDidSave, "error", err)
 
 		var params DidSaveTextDocumentParams
 		if err := dec.Decode(&params); err != nil {
@@ -330,7 +329,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, nil, err)
 
 	case MethodTextDocumentDocumentColor: // request
-		defer logger.Debug(MethodTextDocumentDocumentColor, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentDocumentColor, "error", err)
 
 		var params DocumentColorParams
 		if err := dec.Decode(&params); err != nil {
@@ -342,7 +341,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodTextDocumentDocumentHighlight: // request
-		defer logger.Debug(MethodTextDocumentDocumentHighlight, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentDocumentHighlight, "error", err)
 
 		var params DocumentHighlightParams
 		if err := dec.Decode(&params); err != nil {
@@ -354,7 +353,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodTextDocumentDocumentLink: // request
-		defer logger.Debug(MethodTextDocumentDocumentLink, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentDocumentLink, "error", err)
 
 		var params DocumentLinkParams
 		if err := dec.Decode(&params); err != nil {
@@ -366,7 +365,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodDocumentLinkResolve: // request
-		defer logger.Debug(MethodDocumentLinkResolve, zap.Error(err))
+		defer logger.Debug(MethodDocumentLinkResolve, "error", err)
 
 		var params DocumentLink
 		if err := dec.Decode(&params); err != nil {
@@ -378,7 +377,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodTextDocumentDocumentSymbol: // request
-		defer logger.Debug(MethodTextDocumentDocumentSymbol, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentDocumentSymbol, "error", err)
 
 		var params DocumentSymbolParams
 		if err := dec.Decode(&params); err != nil {
@@ -390,7 +389,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodWorkspaceExecuteCommand: // request
-		defer logger.Debug(MethodWorkspaceExecuteCommand, zap.Error(err))
+		defer logger.Debug(MethodWorkspaceExecuteCommand, "error", err)
 
 		var params ExecuteCommandParams
 		if err := dec.Decode(&params); err != nil {
@@ -402,7 +401,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodTextDocumentFoldingRange: // request
-		defer logger.Debug(MethodTextDocumentFoldingRange, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentFoldingRange, "error", err)
 
 		var params FoldingRangeParams
 		if err := dec.Decode(&params); err != nil {
@@ -414,7 +413,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodTextDocumentFormatting: // request
-		defer logger.Debug(MethodTextDocumentFormatting, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentFormatting, "error", err)
 
 		var params DocumentFormattingParams
 		if err := dec.Decode(&params); err != nil {
@@ -426,7 +425,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodTextDocumentHover: // request
-		defer logger.Debug(MethodTextDocumentHover, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentHover, "error", err)
 
 		var params HoverParams
 		if err := dec.Decode(&params); err != nil {
@@ -438,7 +437,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodTextDocumentImplementation: // request
-		defer logger.Debug(MethodTextDocumentImplementation, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentImplementation, "error", err)
 
 		var params ImplementationParams
 		if err := dec.Decode(&params); err != nil {
@@ -450,7 +449,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodTextDocumentOnTypeFormatting: // request
-		defer logger.Debug(MethodTextDocumentOnTypeFormatting, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentOnTypeFormatting, "error", err)
 
 		var params DocumentOnTypeFormattingParams
 		if err := dec.Decode(&params); err != nil {
@@ -462,7 +461,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodTextDocumentPrepareRename: // request
-		defer logger.Debug(MethodTextDocumentPrepareRename, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentPrepareRename, "error", err)
 
 		var params PrepareRenameParams
 		if err := dec.Decode(&params); err != nil {
@@ -474,7 +473,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodTextDocumentRangeFormatting: // request
-		defer logger.Debug(MethodTextDocumentRangeFormatting, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentRangeFormatting, "error", err)
 
 		var params DocumentRangeFormattingParams
 		if err := dec.Decode(&params); err != nil {
@@ -486,7 +485,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodTextDocumentReferences: // request
-		defer logger.Debug(MethodTextDocumentReferences, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentReferences, "error", err)
 
 		var params ReferenceParams
 		if err := dec.Decode(&params); err != nil {
@@ -498,7 +497,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodTextDocumentRename: // request
-		defer logger.Debug(MethodTextDocumentRename, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentRename, "error", err)
 
 		var params RenameParams
 		if err := dec.Decode(&params); err != nil {
@@ -510,7 +509,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodTextDocumentSignatureHelp: // request
-		defer logger.Debug(MethodTextDocumentSignatureHelp, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentSignatureHelp, "error", err)
 
 		var params SignatureHelpParams
 		if err := dec.Decode(&params); err != nil {
@@ -522,7 +521,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodWorkspaceSymbol: // request
-		defer logger.Debug(MethodWorkspaceSymbol, zap.Error(err))
+		defer logger.Debug(MethodWorkspaceSymbol, "error", err)
 
 		var params WorkspaceSymbolParams
 		if err := dec.Decode(&params); err != nil {
@@ -534,7 +533,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodTextDocumentTypeDefinition: // request
-		defer logger.Debug(MethodTextDocumentTypeDefinition, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentTypeDefinition, "error", err)
 
 		var params TypeDefinitionParams
 		if err := dec.Decode(&params); err != nil {
@@ -546,7 +545,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodTextDocumentWillSave: // notification
-		defer logger.Debug(MethodTextDocumentWillSave, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentWillSave, "error", err)
 
 		var params WillSaveTextDocumentParams
 		if err := dec.Decode(&params); err != nil {
@@ -558,7 +557,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, nil, err)
 
 	case MethodTextDocumentWillSaveWaitUntil: // request
-		defer logger.Debug(MethodTextDocumentWillSaveWaitUntil, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentWillSaveWaitUntil, "error", err)
 
 		var params WillSaveTextDocumentParams
 		if err := dec.Decode(&params); err != nil {
@@ -570,7 +569,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodShowDocument: // request
-		defer logger.Debug(MethodShowDocument, zap.Error(err))
+		defer logger.Debug(MethodShowDocument, "error", err)
 
 		var params ShowDocumentParams
 		if err := dec.Decode(&params); err != nil {
@@ -582,7 +581,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodWillCreateFiles: // request
-		defer logger.Debug(MethodWillCreateFiles, zap.Error(err))
+		defer logger.Debug(MethodWillCreateFiles, "error", err)
 
 		var params CreateFilesParams
 		if err := dec.Decode(&params); err != nil {
@@ -594,7 +593,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodDidCreateFiles: // notification
-		defer logger.Debug(MethodDidCreateFiles, zap.Error(err))
+		defer logger.Debug(MethodDidCreateFiles, "error", err)
 
 		var params CreateFilesParams
 		if err := dec.Decode(&params); err != nil {
@@ -606,7 +605,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, nil, err)
 
 	case MethodWillRenameFiles: // request
-		defer logger.Debug(MethodWillRenameFiles, zap.Error(err))
+		defer logger.Debug(MethodWillRenameFiles, "error", err)
 
 		var params RenameFilesParams
 		if err := dec.Decode(&params); err != nil {
@@ -618,7 +617,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodDidRenameFiles: // notification
-		defer logger.Debug(MethodDidRenameFiles, zap.Error(err))
+		defer logger.Debug(MethodDidRenameFiles, "error", err)
 
 		var params RenameFilesParams
 		if err := dec.Decode(&params); err != nil {
@@ -630,7 +629,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, nil, err)
 
 	case MethodWillDeleteFiles: // request
-		defer logger.Debug(MethodWillDeleteFiles, zap.Error(err))
+		defer logger.Debug(MethodWillDeleteFiles, "error", err)
 
 		var params DeleteFilesParams
 		if err := dec.Decode(&params); err != nil {
@@ -642,7 +641,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodDidDeleteFiles: // notification
-		defer logger.Debug(MethodDidDeleteFiles, zap.Error(err))
+		defer logger.Debug(MethodDidDeleteFiles, "error", err)
 
 		var params DeleteFilesParams
 		if err := dec.Decode(&params); err != nil {
@@ -654,7 +653,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, nil, err)
 
 	case MethodCodeLensRefresh: // request
-		defer logger.Debug(MethodCodeLensRefresh, zap.Error(err))
+		defer logger.Debug(MethodCodeLensRefresh, "error", err)
 
 		if len(req.Params()) > 0 {
 			return true, reply(ctx, nil, fmt.Errorf("expected no params: %w", jsonrpc2.ErrInvalidParams))
@@ -665,7 +664,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, nil, err)
 
 	case MethodTextDocumentPrepareCallHierarchy: // request
-		defer logger.Debug(MethodTextDocumentPrepareCallHierarchy, zap.Error(err))
+		defer logger.Debug(MethodTextDocumentPrepareCallHierarchy, "error", err)
 
 		var params CallHierarchyPrepareParams
 		if err := dec.Decode(&params); err != nil {
@@ -677,7 +676,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodCallHierarchyIncomingCalls: // request
-		defer logger.Debug(MethodCallHierarchyIncomingCalls, zap.Error(err))
+		defer logger.Debug(MethodCallHierarchyIncomingCalls, "error", err)
 
 		var params CallHierarchyIncomingCallsParams
 		if err := dec.Decode(&params); err != nil {
@@ -689,7 +688,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodCallHierarchyOutgoingCalls: // request
-		defer logger.Debug(MethodCallHierarchyOutgoingCalls, zap.Error(err))
+		defer logger.Debug(MethodCallHierarchyOutgoingCalls, "error", err)
 
 		var params CallHierarchyOutgoingCallsParams
 		if err := dec.Decode(&params); err != nil {
@@ -701,7 +700,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodSemanticTokensFull: // request
-		defer logger.Debug(MethodSemanticTokensFull, zap.Error(err))
+		defer logger.Debug(MethodSemanticTokensFull, "error", err)
 
 		var params SemanticTokensParams
 		if err := dec.Decode(&params); err != nil {
@@ -713,7 +712,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodSemanticTokensFullDelta: // request
-		defer logger.Debug(MethodSemanticTokensFullDelta, zap.Error(err))
+		defer logger.Debug(MethodSemanticTokensFullDelta, "error", err)
 
 		var params SemanticTokensDeltaParams
 		if err := dec.Decode(&params); err != nil {
@@ -725,7 +724,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodSemanticTokensRange: // request
-		defer logger.Debug(MethodSemanticTokensRange, zap.Error(err))
+		defer logger.Debug(MethodSemanticTokensRange, "error", err)
 
 		var params SemanticTokensRangeParams
 		if err := dec.Decode(&params); err != nil {
@@ -737,7 +736,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodSemanticTokensRefresh: // request
-		defer logger.Debug(MethodSemanticTokensRefresh, zap.Error(err))
+		defer logger.Debug(MethodSemanticTokensRefresh, "error", err)
 
 		if len(req.Params()) > 0 {
 			return true, reply(ctx, nil, fmt.Errorf("expected no params: %w", jsonrpc2.ErrInvalidParams))
@@ -748,7 +747,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, nil, err)
 
 	case MethodLinkedEditingRange: // request
-		defer logger.Debug(MethodLinkedEditingRange, zap.Error(err))
+		defer logger.Debug(MethodLinkedEditingRange, "error", err)
 
 		var params LinkedEditingRangeParams
 		if err := dec.Decode(&params); err != nil {
@@ -760,7 +759,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodMoniker: // request
-		defer logger.Debug(MethodMoniker, zap.Error(err))
+		defer logger.Debug(MethodMoniker, "error", err)
 
 		var params MonikerParams
 		if err := dec.Decode(&params); err != nil {
@@ -772,7 +771,7 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	case MethodInlayHint: // request
-		defer logger.Debug(MethodInlayHint, zap.Error(err))
+		defer logger.Debug(MethodInlayHint, "error", err)
 
 		var params InlayHintParams
 		if err := dec.Decode(&params); err != nil {
@@ -1043,7 +1042,7 @@ const (
 type server struct {
 	jsonrpc2.Conn
 
-	logger *zap.Logger
+	logger *slog.Logger
 }
 
 var _ Server = (*server)(nil)
@@ -1063,7 +1062,7 @@ var _ Server = (*server)(nil)
 // as well as the window/showMessageRequest request to the client.
 func (s *server) Initialize(ctx context.Context, params *InitializeParams) (_ *InitializeResult, err error) {
 	s.logger.Debug("call " + MethodInitialize)
-	defer s.logger.Debug("end "+MethodInitialize, zap.Error(err))
+	defer s.logger.Debug("end "+MethodInitialize, "error", err)
 
 	var result *InitializeResult
 	if err := Call(ctx, s.Conn, MethodInitialize, params, &result); err != nil {
@@ -1080,7 +1079,7 @@ func (s *server) Initialize(ctx context.Context, params *InitializeParams) (_ *I
 // The initialized notification may only be sent once.
 func (s *server) Initialized(ctx context.Context, params *InitializedParams) (err error) {
 	s.logger.Debug("notify " + MethodInitialized)
-	defer s.logger.Debug("end "+MethodInitialized, zap.Error(err))
+	defer s.logger.Debug("end "+MethodInitialized, "error", err)
 
 	return s.Conn.Notify(ctx, MethodInitialized, params)
 }
@@ -1094,7 +1093,7 @@ func (s *server) Initialized(ctx context.Context, params *InitializedParams) (er
 // If a server receives requests after a shutdown request those requests should be errored with `InvalidRequest`.
 func (s *server) Shutdown(ctx context.Context) (err error) {
 	s.logger.Debug("call " + MethodShutdown)
-	defer s.logger.Debug("end "+MethodShutdown, zap.Error(err))
+	defer s.logger.Debug("end "+MethodShutdown, "error", err)
 
 	return Call(ctx, s.Conn, MethodShutdown, nil, nil)
 }
@@ -1104,7 +1103,7 @@ func (s *server) Shutdown(ctx context.Context) (err error) {
 // The server should exit with success code 0 if the shutdown request has been received before; otherwise with error code 1.
 func (s *server) Exit(ctx context.Context) (err error) {
 	s.logger.Debug("notify " + MethodExit)
-	defer s.logger.Debug("end "+MethodExit, zap.Error(err))
+	defer s.logger.Debug("end "+MethodExit, "error", err)
 
 	return s.Conn.Notify(ctx, MethodExit, nil)
 }
@@ -1119,7 +1118,7 @@ func (s *server) Exit(ctx context.Context) (err error) {
 // @since 3.16.0.
 func (s *server) LogTrace(ctx context.Context, params *LogTraceParams) (err error) {
 	s.logger.Debug("notify " + MethodLogTrace)
-	defer s.logger.Debug("end "+MethodLogTrace, zap.Error(err))
+	defer s.logger.Debug("end "+MethodLogTrace, "error", err)
 
 	return s.Conn.Notify(ctx, MethodLogTrace, params)
 }
@@ -1129,7 +1128,7 @@ func (s *server) LogTrace(ctx context.Context, params *LogTraceParams) (err erro
 // @since 3.16.0.
 func (s *server) SetTrace(ctx context.Context, params *SetTraceParams) (err error) {
 	s.logger.Debug("notify " + MethodSetTrace)
-	defer s.logger.Debug("end "+MethodSetTrace, zap.Error(err))
+	defer s.logger.Debug("end "+MethodSetTrace, "error", err)
 
 	return s.Conn.Notify(ctx, MethodSetTrace, params)
 }
@@ -1138,7 +1137,7 @@ func (s *server) SetTrace(ctx context.Context, params *SetTraceParams) (err erro
 // server side using the "window/workDoneProgress/create".
 func (s *server) WorkDoneProgressCancel(ctx context.Context, params *WorkDoneProgressCancelParams) (err error) {
 	s.logger.Debug("call " + MethodWorkDoneProgressCancel)
-	defer s.logger.Debug("end "+MethodWorkDoneProgressCancel, zap.Error(err))
+	defer s.logger.Debug("end "+MethodWorkDoneProgressCancel, "error", err)
 
 	return s.Conn.Notify(ctx, MethodWorkDoneProgressCancel, params)
 }
@@ -1153,7 +1152,7 @@ func (s *server) WorkDoneProgressCancel(ctx context.Context, params *WorkDonePro
 // If the client supports providing edits with a code action then the mode should be used.
 func (s *server) CodeAction(ctx context.Context, params *CodeActionParams) (result []CodeAction, err error) {
 	s.logger.Debug("call " + MethodTextDocumentCodeAction)
-	defer s.logger.Debug("end "+MethodTextDocumentCodeAction, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentCodeAction, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodTextDocumentCodeAction, params, &result); err != nil {
 		return nil, err
@@ -1165,7 +1164,7 @@ func (s *server) CodeAction(ctx context.Context, params *CodeActionParams) (resu
 // CodeLens sends the request from the client to the server to compute code lenses for a given text document.
 func (s *server) CodeLens(ctx context.Context, params *CodeLensParams) (result []CodeLens, err error) {
 	s.logger.Debug("call " + MethodTextDocumentCodeLens)
-	defer s.logger.Debug("end "+MethodTextDocumentCodeLens, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentCodeLens, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodTextDocumentCodeLens, params, &result); err != nil {
 		return nil, err
@@ -1177,7 +1176,7 @@ func (s *server) CodeLens(ctx context.Context, params *CodeLensParams) (result [
 // CodeLensResolve sends the request from the client to the server to resolve the command for a given code lens item.
 func (s *server) CodeLensResolve(ctx context.Context, params *CodeLens) (_ *CodeLens, err error) {
 	s.logger.Debug("call " + MethodCodeLensResolve)
-	defer s.logger.Debug("end "+MethodCodeLensResolve, zap.Error(err))
+	defer s.logger.Debug("end "+MethodCodeLensResolve, "error", err)
 
 	var result *CodeLens
 	if err := Call(ctx, s.Conn, MethodCodeLensResolve, params, &result); err != nil {
@@ -1195,7 +1194,7 @@ func (s *server) CodeLensResolve(ctx context.Context, params *CodeLens) (_ *Code
 // - show in a color picker and let users pick one of the presentations.
 func (s *server) ColorPresentation(ctx context.Context, params *ColorPresentationParams) (result []ColorPresentation, err error) {
 	s.logger.Debug("call " + MethodTextDocumentColorPresentation)
-	defer s.logger.Debug("end "+MethodTextDocumentColorPresentation, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentColorPresentation, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodTextDocumentColorPresentation, params, &result); err != nil {
 		return nil, err
@@ -1219,7 +1218,7 @@ func (s *server) ColorPresentation(ctx context.Context, params *ColorPresentatio
 // like `sortText`, `filterText`, `insertText`, and `textEdit` must be provided in the `textDocument/completion` response and must not be changed during resolve.
 func (s *server) Completion(ctx context.Context, params *CompletionParams) (_ *CompletionList, err error) {
 	s.logger.Debug("call " + MethodTextDocumentCompletion)
-	defer s.logger.Debug("end "+MethodTextDocumentCompletion, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentCompletion, "error", err)
 
 	var result *CompletionList
 	if err := Call(ctx, s.Conn, MethodTextDocumentCompletion, params, &result); err != nil {
@@ -1232,7 +1231,7 @@ func (s *server) Completion(ctx context.Context, params *CompletionParams) (_ *C
 // CompletionResolve sends the request from the client to the server to resolve additional information for a given completion item.
 func (s *server) CompletionResolve(ctx context.Context, params *CompletionItem) (_ *CompletionItem, err error) {
 	s.logger.Debug("call " + MethodCompletionItemResolve)
-	defer s.logger.Debug("end "+MethodCompletionItemResolve, zap.Error(err))
+	defer s.logger.Debug("end "+MethodCompletionItemResolve, "error", err)
 
 	var result *CompletionItem
 	if err := Call(ctx, s.Conn, MethodCompletionItemResolve, params, &result); err != nil {
@@ -1249,7 +1248,7 @@ func (s *server) CompletionResolve(ctx context.Context, params *CompletionItem) 
 // @since 3.14.0.
 func (s *server) Declaration(ctx context.Context, params *DeclarationParams) (result []Location, err error) {
 	s.logger.Debug("call " + MethodTextDocumentDeclaration)
-	defer s.logger.Debug("end "+MethodTextDocumentDeclaration, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentDeclaration, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodTextDocumentDeclaration, params, &result); err != nil {
 		return nil, err
@@ -1265,7 +1264,7 @@ func (s *server) Declaration(ctx context.Context, params *DeclarationParams) (re
 // @since 3.14.0.
 func (s *server) Definition(ctx context.Context, params *DefinitionParams) (result []Location, err error) {
 	s.logger.Debug("call " + MethodTextDocumentDefinition)
-	defer s.logger.Debug("end "+MethodTextDocumentDefinition, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentDefinition, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodTextDocumentDefinition, params, &result); err != nil {
 		return nil, err
@@ -1279,7 +1278,7 @@ func (s *server) Definition(ctx context.Context, params *DefinitionParams) (resu
 // In 2.0 the shape of the params has changed to include proper version numbers and language ids.
 func (s *server) DidChange(ctx context.Context, params *DidChangeTextDocumentParams) (err error) {
 	s.logger.Debug("notify " + MethodTextDocumentDidChange)
-	defer s.logger.Debug("end "+MethodTextDocumentDidChange, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentDidChange, "error", err)
 
 	return s.Conn.Notify(ctx, MethodTextDocumentDidChange, params)
 }
@@ -1287,7 +1286,7 @@ func (s *server) DidChange(ctx context.Context, params *DidChangeTextDocumentPar
 // DidChangeConfiguration sends the notification from the client to the server to signal the change of configuration settings.
 func (s *server) DidChangeConfiguration(ctx context.Context, params *DidChangeConfigurationParams) (err error) {
 	s.logger.Debug("call " + MethodWorkspaceDidChangeConfiguration)
-	defer s.logger.Debug("end "+MethodWorkspaceDidChangeConfiguration, zap.Error(err))
+	defer s.logger.Debug("end "+MethodWorkspaceDidChangeConfiguration, "error", err)
 
 	return s.Conn.Notify(ctx, MethodWorkspaceDidChangeConfiguration, params)
 }
@@ -1298,7 +1297,7 @@ func (s *server) DidChangeConfiguration(ctx context.Context, params *DidChangeCo
 // In former implementations clients pushed file events without the server actively asking for it.
 func (s *server) DidChangeWatchedFiles(ctx context.Context, params *DidChangeWatchedFilesParams) (err error) {
 	s.logger.Debug("call " + MethodWorkspaceDidChangeWatchedFiles)
-	defer s.logger.Debug("end "+MethodWorkspaceDidChangeWatchedFiles, zap.Error(err))
+	defer s.logger.Debug("end "+MethodWorkspaceDidChangeWatchedFiles, "error", err)
 
 	return s.Conn.Notify(ctx, MethodWorkspaceDidChangeWatchedFiles, params)
 }
@@ -1312,7 +1311,7 @@ func (s *server) DidChangeWatchedFiles(ctx context.Context, params *DidChangeWat
 // The registration parameter must have a registrations item of the following form, where id is a unique id used to unregister the capability (the example uses a UUID).
 func (s *server) DidChangeWorkspaceFolders(ctx context.Context, params *DidChangeWorkspaceFoldersParams) (err error) {
 	s.logger.Debug("call " + MethodWorkspaceDidChangeWorkspaceFolders)
-	defer s.logger.Debug("end "+MethodWorkspaceDidChangeWorkspaceFolders, zap.Error(err))
+	defer s.logger.Debug("end "+MethodWorkspaceDidChangeWorkspaceFolders, "error", err)
 
 	return s.Conn.Notify(ctx, MethodWorkspaceDidChangeWorkspaceFolders, params)
 }
@@ -1327,7 +1326,7 @@ func (s *server) DidChangeWorkspaceFolders(ctx context.Context, params *DidChang
 // Note that a server’s ability to fulfill requests is independent of whether a text document is open or closed.
 func (s *server) DidClose(ctx context.Context, params *DidCloseTextDocumentParams) (err error) {
 	s.logger.Debug("call " + MethodTextDocumentDidClose)
-	defer s.logger.Debug("end "+MethodTextDocumentDidClose, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentDidClose, "error", err)
 
 	return s.Conn.Notify(ctx, MethodTextDocumentDidClose, params)
 }
@@ -1342,7 +1341,7 @@ func (s *server) DidClose(ctx context.Context, params *DidCloseTextDocumentParam
 // Note that a server’s ability to fulfill requests is independent of whether a text document is open or closed.
 func (s *server) DidOpen(ctx context.Context, params *DidOpenTextDocumentParams) (err error) {
 	s.logger.Debug("call " + MethodTextDocumentDidOpen)
-	defer s.logger.Debug("end "+MethodTextDocumentDidOpen, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentDidOpen, "error", err)
 
 	return s.Conn.Notify(ctx, MethodTextDocumentDidOpen, params)
 }
@@ -1350,7 +1349,7 @@ func (s *server) DidOpen(ctx context.Context, params *DidOpenTextDocumentParams)
 // DidSave sends the notification from the client to the server when the document was saved in the client.
 func (s *server) DidSave(ctx context.Context, params *DidSaveTextDocumentParams) (err error) {
 	s.logger.Debug("call " + MethodTextDocumentDidSave)
-	defer s.logger.Debug("end "+MethodTextDocumentDidSave, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentDidSave, "error", err)
 
 	return s.Conn.Notify(ctx, MethodTextDocumentDidSave, params)
 }
@@ -1366,7 +1365,7 @@ func (s *server) DidSave(ctx context.Context, params *DidSaveTextDocumentParams)
 // - Show a color picker when a color reference is edited.
 func (s *server) DocumentColor(ctx context.Context, params *DocumentColorParams) (result []ColorInformation, err error) {
 	s.logger.Debug("call " + MethodTextDocumentDocumentColor)
-	defer s.logger.Debug("end "+MethodTextDocumentDocumentColor, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentDocumentColor, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodTextDocumentDocumentColor, params, &result); err != nil {
 		return nil, err
@@ -1383,7 +1382,7 @@ func (s *server) DocumentColor(ctx context.Context, params *DocumentColorParams)
 // Symbol matches usually have a `DocumentHighlightKind` of `Read` or `Write` whereas fuzzy or textual matches use `Text` as the kind.
 func (s *server) DocumentHighlight(ctx context.Context, params *DocumentHighlightParams) (result []DocumentHighlight, err error) {
 	s.logger.Debug("call " + MethodTextDocumentDocumentHighlight)
-	defer s.logger.Debug("end "+MethodTextDocumentDocumentHighlight, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentDocumentHighlight, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodTextDocumentDocumentHighlight, params, &result); err != nil {
 		return nil, err
@@ -1395,7 +1394,7 @@ func (s *server) DocumentHighlight(ctx context.Context, params *DocumentHighligh
 // DocumentLink sends the request from the client to the server to request the location of links in a document.
 func (s *server) DocumentLink(ctx context.Context, params *DocumentLinkParams) (result []DocumentLink, err error) {
 	s.logger.Debug("call " + MethodTextDocumentDocumentLink)
-	defer s.logger.Debug("end "+MethodTextDocumentDocumentLink, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentDocumentLink, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodTextDocumentDocumentLink, params, &result); err != nil {
 		return nil, err
@@ -1407,7 +1406,7 @@ func (s *server) DocumentLink(ctx context.Context, params *DocumentLinkParams) (
 // DocumentLinkResolve sends the request from the client to the server to resolve the target of a given document link.
 func (s *server) DocumentLinkResolve(ctx context.Context, params *DocumentLink) (_ *DocumentLink, err error) {
 	s.logger.Debug("call " + MethodDocumentLinkResolve)
-	defer s.logger.Debug("end "+MethodDocumentLinkResolve, zap.Error(err))
+	defer s.logger.Debug("end "+MethodDocumentLinkResolve, "error", err)
 
 	var result *DocumentLink
 	if err := Call(ctx, s.Conn, MethodDocumentLinkResolve, params, &result); err != nil {
@@ -1422,7 +1421,7 @@ func (s *server) DocumentLinkResolve(ctx context.Context, params *DocumentLink) 
 // Neither the symbol’s location range nor the symbol’s container name should be used to infer a hierarchy.
 func (s *server) DocumentSymbol(ctx context.Context, params *DocumentSymbolParams) (result []interface{}, err error) {
 	s.logger.Debug("call " + MethodTextDocumentDocumentSymbol)
-	defer s.logger.Debug("end "+MethodTextDocumentDocumentSymbol, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentDocumentSymbol, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodTextDocumentDocumentSymbol, params, &result); err != nil {
 		return nil, err
@@ -1437,7 +1436,7 @@ func (s *server) DocumentSymbol(ctx context.Context, params *DocumentSymbolParam
 // request `workspace/applyEdit` which is sent from the server to the client.
 func (s *server) ExecuteCommand(ctx context.Context, params *ExecuteCommandParams) (result interface{}, err error) {
 	s.logger.Debug("call " + MethodWorkspaceExecuteCommand)
-	defer s.logger.Debug("end "+MethodWorkspaceExecuteCommand, zap.Error(err))
+	defer s.logger.Debug("end "+MethodWorkspaceExecuteCommand, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodWorkspaceExecuteCommand, params, &result); err != nil {
 		return nil, err
@@ -1451,7 +1450,7 @@ func (s *server) ExecuteCommand(ctx context.Context, params *ExecuteCommandParam
 // @since version 3.10.0.
 func (s *server) FoldingRanges(ctx context.Context, params *FoldingRangeParams) (result []FoldingRange, err error) {
 	s.logger.Debug("call " + MethodTextDocumentFoldingRange)
-	defer s.logger.Debug("end "+MethodTextDocumentFoldingRange, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentFoldingRange, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodTextDocumentFoldingRange, params, &result); err != nil {
 		return nil, err
@@ -1463,7 +1462,7 @@ func (s *server) FoldingRanges(ctx context.Context, params *FoldingRangeParams) 
 // Formatting sends the request from the client to the server to format a whole document.
 func (s *server) Formatting(ctx context.Context, params *DocumentFormattingParams) (result []TextEdit, err error) {
 	s.logger.Debug("call " + MethodTextDocumentFormatting)
-	defer s.logger.Debug("end "+MethodTextDocumentFormatting, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentFormatting, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodTextDocumentFormatting, params, &result); err != nil {
 		return nil, err
@@ -1475,7 +1474,7 @@ func (s *server) Formatting(ctx context.Context, params *DocumentFormattingParam
 // Hover sends the request is from the client to the server to request hover information at a given text document position.
 func (s *server) Hover(ctx context.Context, params *HoverParams) (_ *Hover, err error) {
 	s.logger.Debug("call " + MethodTextDocumentHover)
-	defer s.logger.Debug("end "+MethodTextDocumentHover, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentHover, "error", err)
 
 	var result *Hover
 	if err := Call(ctx, s.Conn, MethodTextDocumentHover, params, &result); err != nil {
@@ -1490,7 +1489,7 @@ func (s *server) Hover(ctx context.Context, params *HoverParams) (_ *Hover, err 
 // The result type `[]LocationLink` got introduce with version 3.14.0 and depends in the corresponding client capability `clientCapabilities.implementation.typeDefinition.linkSupport`.
 func (s *server) Implementation(ctx context.Context, params *ImplementationParams) (result []Location, err error) {
 	s.logger.Debug("call " + MethodTextDocumentImplementation)
-	defer s.logger.Debug("end "+MethodTextDocumentImplementation, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentImplementation, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodTextDocumentImplementation, params, &result); err != nil {
 		return nil, err
@@ -1502,7 +1501,7 @@ func (s *server) Implementation(ctx context.Context, params *ImplementationParam
 // OnTypeFormatting sends the request from the client to the server to format parts of the document during typing.
 func (s *server) OnTypeFormatting(ctx context.Context, params *DocumentOnTypeFormattingParams) (result []TextEdit, err error) {
 	s.logger.Debug("call " + MethodTextDocumentOnTypeFormatting)
-	defer s.logger.Debug("end "+MethodTextDocumentOnTypeFormatting, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentOnTypeFormatting, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodTextDocumentOnTypeFormatting, params, &result); err != nil {
 		return nil, err
@@ -1516,7 +1515,7 @@ func (s *server) OnTypeFormatting(ctx context.Context, params *DocumentOnTypeFor
 // @since version 3.12.0.
 func (s *server) PrepareRename(ctx context.Context, params *PrepareRenameParams) (result *Range, err error) {
 	s.logger.Debug("call " + MethodTextDocumentPrepareRename)
-	defer s.logger.Debug("end "+MethodTextDocumentPrepareRename, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentPrepareRename, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodTextDocumentPrepareRename, params, &result); err != nil {
 		return nil, err
@@ -1528,7 +1527,7 @@ func (s *server) PrepareRename(ctx context.Context, params *PrepareRenameParams)
 // RangeFormatting sends the request from the client to the server to format a given range in a document.
 func (s *server) RangeFormatting(ctx context.Context, params *DocumentRangeFormattingParams) (result []TextEdit, err error) {
 	s.logger.Debug("call " + MethodTextDocumentRangeFormatting)
-	defer s.logger.Debug("end "+MethodTextDocumentRangeFormatting, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentRangeFormatting, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodTextDocumentRangeFormatting, params, &result); err != nil {
 		return nil, err
@@ -1540,7 +1539,7 @@ func (s *server) RangeFormatting(ctx context.Context, params *DocumentRangeForma
 // References sends the request from the client to the server to resolve project-wide references for the symbol denoted by the given text document position.
 func (s *server) References(ctx context.Context, params *ReferenceParams) (result []Location, err error) {
 	s.logger.Debug("call " + MethodTextDocumentReferences)
-	defer s.logger.Debug("end "+MethodTextDocumentReferences, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentReferences, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodTextDocumentReferences, params, &result); err != nil {
 		return nil, err
@@ -1552,7 +1551,7 @@ func (s *server) References(ctx context.Context, params *ReferenceParams) (resul
 // Rename sends the request from the client to the server to perform a workspace-wide rename of a symbol.
 func (s *server) Rename(ctx context.Context, params *RenameParams) (result *WorkspaceEdit, err error) {
 	s.logger.Debug("call " + MethodTextDocumentRename)
-	defer s.logger.Debug("end "+MethodTextDocumentRename, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentRename, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodTextDocumentRename, params, &result); err != nil {
 		return nil, err
@@ -1564,7 +1563,7 @@ func (s *server) Rename(ctx context.Context, params *RenameParams) (result *Work
 // SignatureHelp sends the request from the client to the server to request signature information at a given cursor position.
 func (s *server) SignatureHelp(ctx context.Context, params *SignatureHelpParams) (_ *SignatureHelp, err error) {
 	s.logger.Debug("call " + MethodTextDocumentSignatureHelp)
-	defer s.logger.Debug("end "+MethodTextDocumentSignatureHelp, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentSignatureHelp, "error", err)
 
 	var result *SignatureHelp
 	if err := Call(ctx, s.Conn, MethodTextDocumentSignatureHelp, params, &result); err != nil {
@@ -1577,7 +1576,7 @@ func (s *server) SignatureHelp(ctx context.Context, params *SignatureHelpParams)
 // Symbols sends the request from the client to the server to list project-wide symbols matching the query string.
 func (s *server) Symbols(ctx context.Context, params *WorkspaceSymbolParams) (result []SymbolInformation, err error) {
 	s.logger.Debug("call " + MethodWorkspaceSymbol)
-	defer s.logger.Debug("end "+MethodWorkspaceSymbol, zap.Error(err))
+	defer s.logger.Debug("end "+MethodWorkspaceSymbol, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodWorkspaceSymbol, params, &result); err != nil {
 		return nil, err
@@ -1593,7 +1592,7 @@ func (s *server) Symbols(ctx context.Context, params *WorkspaceSymbolParams) (re
 // @since version 3.6.0.
 func (s *server) TypeDefinition(ctx context.Context, params *TypeDefinitionParams) (result []Location, err error) {
 	s.logger.Debug("call " + MethodTextDocumentTypeDefinition)
-	defer s.logger.Debug("end "+MethodTextDocumentTypeDefinition, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentTypeDefinition, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodTextDocumentTypeDefinition, params, &result); err != nil {
 		return nil, err
@@ -1605,7 +1604,7 @@ func (s *server) TypeDefinition(ctx context.Context, params *TypeDefinitionParam
 // WillSave sends the notification from the client to the server before the document is actually saved.
 func (s *server) WillSave(ctx context.Context, params *WillSaveTextDocumentParams) (err error) {
 	s.logger.Debug("call " + MethodTextDocumentWillSave)
-	defer s.logger.Debug("end "+MethodTextDocumentWillSave, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentWillSave, "error", err)
 
 	return s.Conn.Notify(ctx, MethodTextDocumentWillSave, params)
 }
@@ -1617,7 +1616,7 @@ func (s *server) WillSave(ctx context.Context, params *WillSaveTextDocumentParam
 // This is done to keep the save fast and reliable.
 func (s *server) WillSaveWaitUntil(ctx context.Context, params *WillSaveTextDocumentParams) (result []TextEdit, err error) {
 	s.logger.Debug("call " + MethodTextDocumentWillSaveWaitUntil)
-	defer s.logger.Debug("end "+MethodTextDocumentWillSaveWaitUntil, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentWillSaveWaitUntil, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodTextDocumentWillSaveWaitUntil, params, &result); err != nil {
 		return nil, err
@@ -1631,7 +1630,7 @@ func (s *server) WillSaveWaitUntil(ctx context.Context, params *WillSaveTextDocu
 // @since 3.16.0.
 func (s *server) ShowDocument(ctx context.Context, params *ShowDocumentParams) (result *ShowDocumentResult, err error) {
 	s.logger.Debug("call " + MethodShowDocument)
-	defer s.logger.Debug("end "+MethodShowDocument, zap.Error(err))
+	defer s.logger.Debug("end "+MethodShowDocument, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodShowDocument, params, &result); err != nil {
 		return nil, err
@@ -1649,7 +1648,7 @@ func (s *server) ShowDocument(ctx context.Context, params *ShowDocumentParams) (
 // @since 3.16.0.
 func (s *server) WillCreateFiles(ctx context.Context, params *CreateFilesParams) (result *WorkspaceEdit, err error) {
 	s.logger.Debug("call " + MethodWillCreateFiles)
-	defer s.logger.Debug("end "+MethodWillCreateFiles, zap.Error(err))
+	defer s.logger.Debug("end "+MethodWillCreateFiles, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodWillCreateFiles, params, &result); err != nil {
 		return nil, err
@@ -1663,7 +1662,7 @@ func (s *server) WillCreateFiles(ctx context.Context, params *CreateFilesParams)
 // @since 3.16.0.
 func (s *server) DidCreateFiles(ctx context.Context, params *CreateFilesParams) (err error) {
 	s.logger.Debug("call " + MethodDidCreateFiles)
-	defer s.logger.Debug("end "+MethodDidCreateFiles, zap.Error(err))
+	defer s.logger.Debug("end "+MethodDidCreateFiles, "error", err)
 
 	return s.Conn.Notify(ctx, MethodDidCreateFiles, params)
 }
@@ -1677,7 +1676,7 @@ func (s *server) DidCreateFiles(ctx context.Context, params *CreateFilesParams) 
 // @since 3.16.0.
 func (s *server) WillRenameFiles(ctx context.Context, params *RenameFilesParams) (result *WorkspaceEdit, err error) {
 	s.logger.Debug("call " + MethodWillRenameFiles)
-	defer s.logger.Debug("end "+MethodWillRenameFiles, zap.Error(err))
+	defer s.logger.Debug("end "+MethodWillRenameFiles, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodWillRenameFiles, params, &result); err != nil {
 		return nil, err
@@ -1691,7 +1690,7 @@ func (s *server) WillRenameFiles(ctx context.Context, params *RenameFilesParams)
 // @since 3.16.0.
 func (s *server) DidRenameFiles(ctx context.Context, params *RenameFilesParams) (err error) {
 	s.logger.Debug("call " + MethodDidRenameFiles)
-	defer s.logger.Debug("end "+MethodDidRenameFiles, zap.Error(err))
+	defer s.logger.Debug("end "+MethodDidRenameFiles, "error", err)
 
 	return s.Conn.Notify(ctx, MethodDidRenameFiles, params)
 }
@@ -1705,7 +1704,7 @@ func (s *server) DidRenameFiles(ctx context.Context, params *RenameFilesParams) 
 // @since 3.16.0.
 func (s *server) WillDeleteFiles(ctx context.Context, params *DeleteFilesParams) (result *WorkspaceEdit, err error) {
 	s.logger.Debug("call " + MethodWillDeleteFiles)
-	defer s.logger.Debug("end "+MethodWillDeleteFiles, zap.Error(err))
+	defer s.logger.Debug("end "+MethodWillDeleteFiles, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodWillDeleteFiles, params, &result); err != nil {
 		return nil, err
@@ -1719,7 +1718,7 @@ func (s *server) WillDeleteFiles(ctx context.Context, params *DeleteFilesParams)
 // @since 3.16.0.
 func (s *server) DidDeleteFiles(ctx context.Context, params *DeleteFilesParams) (err error) {
 	s.logger.Debug("call " + MethodDidDeleteFiles)
-	defer s.logger.Debug("end "+MethodDidDeleteFiles, zap.Error(err))
+	defer s.logger.Debug("end "+MethodDidDeleteFiles, "error", err)
 
 	return s.Conn.Notify(ctx, MethodDidDeleteFiles, params)
 }
@@ -1735,7 +1734,7 @@ func (s *server) DidDeleteFiles(ctx context.Context, params *DeleteFilesParams) 
 // @since 3.16.0.
 func (s *server) CodeLensRefresh(ctx context.Context) (err error) {
 	s.logger.Debug("call " + MethodCodeLensRefresh)
-	defer s.logger.Debug("end "+MethodCodeLensRefresh, zap.Error(err))
+	defer s.logger.Debug("end "+MethodCodeLensRefresh, "error", err)
 
 	return Call(ctx, s.Conn, MethodCodeLensRefresh, nil, nil)
 }
@@ -1749,7 +1748,7 @@ func (s *server) CodeLensRefresh(ctx context.Context) (err error) {
 // @since 3.16.0.
 func (s *server) PrepareCallHierarchy(ctx context.Context, params *CallHierarchyPrepareParams) (result []CallHierarchyItem, err error) {
 	s.logger.Debug("call " + MethodTextDocumentPrepareCallHierarchy)
-	defer s.logger.Debug("end "+MethodTextDocumentPrepareCallHierarchy, zap.Error(err))
+	defer s.logger.Debug("end "+MethodTextDocumentPrepareCallHierarchy, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodTextDocumentPrepareCallHierarchy, params, &result); err != nil {
 		return nil, err
@@ -1765,7 +1764,7 @@ func (s *server) PrepareCallHierarchy(ctx context.Context, params *CallHierarchy
 // @since 3.16.0.
 func (s *server) IncomingCalls(ctx context.Context, params *CallHierarchyIncomingCallsParams) (result []CallHierarchyIncomingCall, err error) {
 	s.logger.Debug("call " + MethodCallHierarchyIncomingCalls)
-	defer s.logger.Debug("end "+MethodCallHierarchyIncomingCalls, zap.Error(err))
+	defer s.logger.Debug("end "+MethodCallHierarchyIncomingCalls, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodCallHierarchyIncomingCalls, params, &result); err != nil {
 		return nil, err
@@ -1781,7 +1780,7 @@ func (s *server) IncomingCalls(ctx context.Context, params *CallHierarchyIncomin
 // @since 3.16.0.
 func (s *server) OutgoingCalls(ctx context.Context, params *CallHierarchyOutgoingCallsParams) (result []CallHierarchyOutgoingCall, err error) {
 	s.logger.Debug("call " + MethodCallHierarchyOutgoingCalls)
-	defer s.logger.Debug("end "+MethodCallHierarchyOutgoingCalls, zap.Error(err))
+	defer s.logger.Debug("end "+MethodCallHierarchyOutgoingCalls, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodCallHierarchyOutgoingCalls, params, &result); err != nil {
 		return nil, err
@@ -1799,7 +1798,7 @@ func (s *server) OutgoingCalls(ctx context.Context, params *CallHierarchyOutgoin
 // @since 3.16.0.
 func (s *server) SemanticTokensFull(ctx context.Context, params *SemanticTokensParams) (result *SemanticTokens, err error) {
 	s.logger.Debug("call " + MethodSemanticTokensFull)
-	defer s.logger.Debug("end "+MethodSemanticTokensFull, zap.Error(err))
+	defer s.logger.Debug("end "+MethodSemanticTokensFull, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodSemanticTokensFull, params, &result); err != nil {
 		return nil, err
@@ -1817,7 +1816,7 @@ func (s *server) SemanticTokensFull(ctx context.Context, params *SemanticTokensP
 // @since 3.16.0.
 func (s *server) SemanticTokensFullDelta(ctx context.Context, params *SemanticTokensDeltaParams) (result interface{}, err error) {
 	s.logger.Debug("call " + MethodSemanticTokensFullDelta)
-	defer s.logger.Debug("end "+MethodSemanticTokensFullDelta, zap.Error(err))
+	defer s.logger.Debug("end "+MethodSemanticTokensFullDelta, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodSemanticTokensFullDelta, params, &result); err != nil {
 		return nil, err
@@ -1836,7 +1835,7 @@ func (s *server) SemanticTokensFullDelta(ctx context.Context, params *SemanticTo
 // @since 3.16.0.
 func (s *server) SemanticTokensRange(ctx context.Context, params *SemanticTokensRangeParams) (result *SemanticTokens, err error) {
 	s.logger.Debug("call " + MethodSemanticTokensRange)
-	defer s.logger.Debug("end "+MethodSemanticTokensRange, zap.Error(err))
+	defer s.logger.Debug("end "+MethodSemanticTokensRange, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodSemanticTokensRange, params, &result); err != nil {
 		return nil, err
@@ -1855,7 +1854,7 @@ func (s *server) SemanticTokensRange(ctx context.Context, params *SemanticTokens
 // @since 3.16.0.
 func (s *server) SemanticTokensRefresh(ctx context.Context) (err error) {
 	s.logger.Debug("call " + MethodSemanticTokensRefresh)
-	defer s.logger.Debug("end "+MethodSemanticTokensRefresh, zap.Error(err))
+	defer s.logger.Debug("end "+MethodSemanticTokensRefresh, "error", err)
 
 	return Call(ctx, s.Conn, MethodSemanticTokensRefresh, nil, nil)
 }
@@ -1869,7 +1868,7 @@ func (s *server) SemanticTokensRefresh(ctx context.Context) (err error) {
 // @since 3.16.0.
 func (s *server) LinkedEditingRange(ctx context.Context, params *LinkedEditingRangeParams) (result *LinkedEditingRanges, err error) {
 	s.logger.Debug("call " + MethodLinkedEditingRange)
-	defer s.logger.Debug("end "+MethodLinkedEditingRange, zap.Error(err))
+	defer s.logger.Debug("end "+MethodLinkedEditingRange, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodLinkedEditingRange, params, &result); err != nil {
 		return nil, err
@@ -1887,7 +1886,7 @@ func (s *server) LinkedEditingRange(ctx context.Context, params *LinkedEditingRa
 // @since 3.16.0.
 func (s *server) Moniker(ctx context.Context, params *MonikerParams) (result []Moniker, err error) {
 	s.logger.Debug("call " + MethodMoniker)
-	defer s.logger.Debug("end "+MethodMoniker, zap.Error(err))
+	defer s.logger.Debug("end "+MethodMoniker, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodMoniker, params, &result); err != nil {
 		return nil, err
@@ -1898,7 +1897,7 @@ func (s *server) Moniker(ctx context.Context, params *MonikerParams) (result []M
 
 func (s *server) InlayHint(ctx context.Context, params *InlayHintParams) (result []InlayHint, err error) {
 	s.logger.Debug("call " + MethodInlayHint)
-	defer s.logger.Debug("end "+MethodInlayHint, zap.Error(err))
+	defer s.logger.Debug("end "+MethodInlayHint, "error", err)
 
 	if err := Call(ctx, s.Conn, MethodInlayHint, params, &result); err != nil {
 		return nil, err
